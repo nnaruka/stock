@@ -1,0 +1,17 @@
+FILE=CMVOLT_"`echo $(date +%d%m%Y)`".csv
+
+curl -O https://www.nseindia.com/archives/nsccl/volt/$FILE
+
+cat $FILE | awk -F',' '{print $2,$7,$8}'| awk '{print $1, $2=$2*100, $3=$3*100 }' OFS=, > DailyVolatility
+
+curl -O https://www.nseindia.com/content/indices/ind_nifty100list.csv
+
+cat ind_nifty100list.csv |  awk -F',' '{print $3}' > Nifty100
+
+> NIFTY100Volatility
+for i in `cat Nifty100`
+do
+	grep ^$i, DailyVolatility | grep -v 'Underlying Log Returns' >> NIFTY100Volatility
+done;
+
+cat NIFTY100Volatility | awk -F',' '{print $1,$2,$3}' | sort -nr +2 | awk  '{print $1,$2,$3}' OFS=, > "Report$FILE"
