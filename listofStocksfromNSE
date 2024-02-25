@@ -1,0 +1,1 @@
+cat stocklist| grep -e '<option value'| sed 's/<option value="/&\n/g' | awk -F'"' '{print $1}'
